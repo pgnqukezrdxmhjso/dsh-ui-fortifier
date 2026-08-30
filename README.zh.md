@@ -19,7 +19,7 @@ dsh plugin --profile web add dsh-ui-fortifier
 
 ## 功能
 
-在设置页新增「dsh-ui-fortifier」标签页，集中开关本插件各功能模块。
+在设置页新增「ui-fortifier」标签页，集中开关本插件各功能模块。
 
 | 功能 | 描述 |
 | --- | --- |

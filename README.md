@@ -19,7 +19,7 @@ Installing via GitHub is not supported.
 
 ## Features
 
-Adds a "dsh-ui-fortifier" tab in Settings to toggle every feature module of this plugin.
+Adds a "ui-fortifier" tab in Settings to toggle every feature module of this plugin.
 
 | Feature | Description |
 | --- | --- |
