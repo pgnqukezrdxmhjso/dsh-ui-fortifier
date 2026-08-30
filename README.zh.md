@@ -1,6 +1,7 @@
 # dsh-ui-fortifier
 
 ![AI-Crap](https://img.shields.io/badge/💩-AI_crap_code-5C4033?style=flat-square)
+[![npm](https://img.shields.io/npm/v/dsh-ui-fortifier?style=flat-square)](https://www.npmjs.com/package/dsh-ui-fortifier)
 
 [English](README.md)
 
