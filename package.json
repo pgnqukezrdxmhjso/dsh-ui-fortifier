@@ -1,37 +1,56 @@
 {
   "name": "dsh-ui-fortifier",
   "description": "UI 强化",
-  "version": "0.1.0",
-  "main": "lib/index.js",
-  "types": "lib/types/index.d.ts",
-  "scripts": {
-    "bundle": "tsc -b && tsdown",
-    "watch": "tsdown --watch"
-  },
-  "files": [
-    "lib/index.js",
-    "lib/invariant.js",
-    "lib/client.js",
-    "lib/types/**/*.d.ts"
-  ],
+  "version": "0.1.1",
+  "license": "MIT",
   "contributors": [
     "pgnqukezrdxmhjso"
   ],
   "homepage": "https://github.com/pgnqukezrdxmhjso/dsh-ui-fortifier",
-  "bugs": {
-    "url": "https://github.com/pgnqukezrdxmhjso/dsh-ui-fortifier/issues"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/pgnqukezrdxmhjso/dsh-ui-fortifier.git"
   },
-  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pgnqukezrdxmhjso/dsh-ui-fortifier/issues"
+  },
   "keywords": [
     "dsh",
     "plugin",
     "ui",
     "fortifier"
   ],
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/types/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./invariant": {
+      "types": "./lib/types/invariant.d.ts",
+      "default": "./lib/invariant.js"
+    },
+    "./client": {
+      "types": "./lib/types/client/index.d.ts",
+      "default": "./lib/client.js"
+    },
+    "./src/*": "./src/*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "cordis.patch.yml",
+    "lib/index.js",
+    "lib/invariant.js",
+    "lib/client.js",
+    "lib/types/**/*.d.ts"
+  ],
+  "scripts": {
+    "bundle": "tsc -b && tsdown",
+    "watch": "tsdown --watch",
+    "pub": "npm login --registry=https://registry.npmjs.org && npm publish --registry=https://registry.npmjs.org"
+  },
   "peerDependencies": {
     "@deepseek-ai/cordis": "workspace:^",
     "@deepseek-ai/dsh-api-session-controller": "workspace:^",
@@ -57,23 +76,6 @@
     "@deepseek-ai/schemastery": "workspace:^",
     "@types/react": "~18.3.1",
     "react": "^18.2.0"
-  },
-  "type": "module",
-  "exports": {
-    ".": {
-      "types": "./lib/types/index.d.ts",
-      "default": "./lib/index.js"
-    },
-    "./invariant": {
-      "types": "./lib/types/invariant.d.ts",
-      "default": "./lib/invariant.js"
-    },
-    "./client": {
-      "types": "./lib/types/client/index.d.ts",
-      "default": "./lib/client.js"
-    },
-    "./src/*": "./src/*",
-    "./package.json": "./package.json"
   },
   "dsh": {
     "bundle": {
