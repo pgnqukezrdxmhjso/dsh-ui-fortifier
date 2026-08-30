@@ -12,8 +12,6 @@ Toggle state uses the dsh settings service three-layer resolution: schema defaul
 
 ## todo
 
-- [ ] Push to GitHub repository
-
 ## Features
 
 ### Settings page
