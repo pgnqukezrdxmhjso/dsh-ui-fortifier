@@ -1,0 +1,16 @@
+{
+  "extends": "../../../tsconfig.base.client.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["tsdown.config.ts"],
+  "references": [
+    {
+      "path": "../../client/modules"
+    },
+    {
+      "path": "../../client/web"
+    }
+  ]
+}
