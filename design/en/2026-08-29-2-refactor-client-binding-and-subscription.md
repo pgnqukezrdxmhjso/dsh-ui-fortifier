@@ -1,4 +1,4 @@
-# 5-refactor-2026-08-29-2
+# 2026-08-29-2-refactor-client-binding-and-subscription
 
 ## Direct cause
 
