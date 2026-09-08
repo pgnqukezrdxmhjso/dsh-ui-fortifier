@@ -1,4 +1,4 @@
-# 6-refactor-2026-08-29-3
+# 2026-08-29-3-refactor-centralize-module-mounting
 
 ## Direct cause
 

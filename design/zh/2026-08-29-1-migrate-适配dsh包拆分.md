@@ -1,4 +1,4 @@
-﻿# 4-migrate-2026-08-29-1
+# 2026-08-29-1-migrate-适配dsh包拆分
 
 ## 直接原因
 
@@ -10,8 +10,8 @@
 - `SessionId` 改从 `@deepseek-ai/dsh-session/types` 导入。
 - `SettingsScope` 改从 `@deepseek-ai/dsh-client-ui-settings/client` 导入。
 - `ctx.slots` 类型通过 `@deepseek-ai/dsh-client-ui-renderer/client` 空 import 引入。
-- package.json 依赖删 dsh-client-runtime,加 dsh-api-session-controller、dsh-client-ui-renderer。
-- tsconfig references 改用 session-controller/tsconfig.client.json、ui-renderer、core/session。
+- [package.json](../../package.json) 依赖删 dsh-client-runtime,加 dsh-api-session-controller、dsh-client-ui-renderer。
+- [tsconfig.json](../../tsconfig.json) references 改用 session-controller/tsconfig.client.json、ui-renderer、core/session。
 
 ## 思路
 

@@ -1,4 +1,4 @@
-# 3-refactor-2026-08-23-3
+# 2026-08-23-3-refactor-config-same-name-and-simplify-display-name
 
 ## Direct cause
 

@@ -1,9 +1,8 @@
 # dsh-ui-fortifier
 
-![AI-Crap](https://img.shields.io/badge/💩-AI_crap_code-5C4033?style=flat-square)
-[![npm](https://img.shields.io/npm/v/dsh-ui-fortifier?style=flat-square)](https://www.npmjs.com/package/dsh-ui-fortifier)
+![AI-Crap](https://img.shields.io/badge/💩-AI_crap_code-5C4033?style=flat-square) [![npm](https://img.shields.io/npm/v/dsh-ui-fortifier?style=flat-square)](https://www.npmjs.com/package/dsh-ui-fortifier)
 
-[English](README.md)
+[English](./README.md)
 
 DSH Web UI 强化插件
 
@@ -15,7 +14,7 @@ DSH Web UI 强化插件
 dsh plugin --profile web add dsh-ui-fortifier
 ```
 
-不支持通过 GitHub 安装。
+**不支持通过 GitHub 安装。**
 
 ## 功能
 
@@ -25,7 +24,9 @@ dsh plugin --profile web add dsh-ui-fortifier
 | --- | --- |
 | provider-label | 在模型选择按钮左侧显示当前选择的提供方。 |
 
-## 基于 dsh `0.1.2-alpha.1` 开发
+## 构建使用的 dsh 版本
+
+- 目标 dsh 版本：`0.1.2-rc.1`；`@deepseek-ai/dsh-*` 依赖使用 `workspace:^`。
 
 ## 二次开发说明
 
