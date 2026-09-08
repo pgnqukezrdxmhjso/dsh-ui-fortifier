@@ -1,9 +1,10 @@
 import type { Context } from '@deepseek-ai/cordis'
-import { installSettingsSection, settingsNamespace } from '@deepseek-ai/dsh-settings'
+// Type-only：拉取 settings 服务的 Context merge（ctx.settings）。
+import type {} from '@deepseek-ai/dsh-settings'
 import z from '@deepseek-ai/schemastery'
 
 /** 功能开关的 settings 命名空间。 */
-export const UI_FORTIFIER_SETTINGS_NAMESPACE = settingsNamespace('ui-fortifier')
+export const UI_FORTIFIER_SETTINGS_NAMESPACE = 'ui-fortifier'
 
 /** 插件配置：功能开关状态(配置默认值)。 */
 export interface Config {
@@ -22,8 +23,10 @@ export const Config: z<Config> = z.object({
  * @param config - 插件配置,作为 base 层。
  */
 export function apply(ctx: Context, config: Config): void {
-  installSettingsSection(ctx, UI_FORTIFIER_SETTINGS_NAMESPACE, Config, config, {
-    setSource: () => {},
-    onChange: () => {},
+  ctx.inject(['settings'], (settingsCtx) => {
+    settingsCtx.settings.installSection(ctx, UI_FORTIFIER_SETTINGS_NAMESPACE, Config, config, {
+      setSource: () => {},
+      onChange: () => {},
+    })
   })
 }
