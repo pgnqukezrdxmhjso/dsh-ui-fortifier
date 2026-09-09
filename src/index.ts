@@ -13,12 +13,15 @@ export interface Config {
   'provider-label': boolean
   /** 设置页右上角显示打开 .dsh 文件夹按钮。 */
   'open-dsh-folder': boolean
+  /** 设置面板可拖动位置与大小。 */
+  'settings-frame': boolean
 }
 
 /** 插件配置 schema。 */
 export const Config: z<Config> = z.object({
   'provider-label': z.boolean().default(true),
   'open-dsh-folder': z.boolean().default(true),
+  'settings-frame': z.boolean().default(true),
 })
 
 /**

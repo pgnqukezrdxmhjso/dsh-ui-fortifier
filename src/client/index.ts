@@ -10,6 +10,7 @@ import type { } from '@deepseek-ai/dsh-session/types'
 import { installSettings } from './settings'
 import { installProviderLabel } from './provider-label'
 import { installOpenDshFolder } from './open-dsh-folder'
+import { installSettingsFrame } from './settings-frame'
 import type { UiFortifierLocaleKey } from './locales.ts'
 
 /** 一个功能模块的安装面。 */
@@ -28,6 +29,10 @@ export const modules: Record<keyof Config, ModuleEntry> = {
   },
   'open-dsh-folder': {
     module: installOpenDshFolder,
+    dispose: undefined,
+  },
+  'settings-frame': {
+    module: installSettingsFrame,
     dispose: undefined,
   },
 }
