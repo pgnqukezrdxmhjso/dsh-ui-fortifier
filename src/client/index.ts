@@ -9,6 +9,7 @@ import type { } from '@deepseek-ai/dsh-client-ui-renderer/client'
 import type { } from '@deepseek-ai/dsh-session/types'
 import { installSettings } from './settings'
 import { installProviderLabel } from './provider-label'
+import { installOpenDshFolder } from './open-dsh-folder'
 import type { UiFortifierLocaleKey } from './locales.ts'
 
 /** 一个功能模块的安装面。 */
@@ -25,13 +26,17 @@ export const modules: Record<keyof Config, ModuleEntry> = {
     module: installProviderLabel,
     dispose: undefined,
   },
+  'open-dsh-folder': {
+    module: installOpenDshFolder,
+    dispose: undefined,
+  },
 }
 
-export const inject = ['slots', 'locale', 'settingsScope', 'modelDirectories']
+export const inject = ['slots', 'locale', 'settingsScope', 'modelDirectories', 'connection']
 
 /**
  * 客户端插件体：注册设置页并据开关状态挂载各功能模块。
- * @param ctx - 需已提供 slots/locale/settingsScope/modelDirectories 的客户端上下文。
+ * @param ctx - 需已提供 slots/locale/settingsScope/modelDirectories/connection 的客户端上下文。
  */
 export function apply(ctx: Context): void {
   const scope = installSettings(ctx, Object.keys(modules))
