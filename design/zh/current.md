@@ -20,6 +20,22 @@ DSH Web UI 强化插件：在设置页提供功能模块开关，并显示当前
 - 实现位置：[src/client/index.ts](../../src/client/index.ts)、[src/client/settings/FortifierSettingsPage.tsx](../../src/client/settings/FortifierSettingsPage.tsx)
 - 解决方案：client 侧绑定 settingsScope，从 describe mirror 读取命名空间值；开关行列表由功能模块字段列表驱动，逐字段渲染；写入走 settings 作用域的写接口。
 - 思路：新增功能时在 host `Config` 加字段、`modules` 加条目、`locales.ts` 加文案 key（`config.<字段名>`），设置页自动出现新开关，无需修改设置页代码。
+- 排版约束：列表内容限宽 520px（面板被拖宽时开关不远离文字），相邻选项用 0.5px 横线分隔。
+- 开关样式：照抄官方 `ui-settings-plugins` 的 Switch 模式（`role="switch"` + thumb），thumb 为 `border-radius: 50%` 正圆并配对 `corner-shape: round`——与 dsh 内置开关一致，受 ui-theme 全局超椭圆平滑规范约束（正圆必须配对保持圆弧）。
+
+### open-dsh-folder
+
+- 功能描述：在设置页右上角操作区增加「打开 .dsh 文件夹」按钮，一键打开 `$DSH_HOME` 目录。
+- 实现位置：[src/client/open-dsh-folder/](../../src/client/open-dsh-folder/)、[src/open-dsh-folder.ts](../../src/open-dsh-folder.ts)
+- 解决方案：host 侧提供 TypertRemoteService（`uiFortifierRemote`）暴露 `openDshFolder` 远程方法，经 `ctx.reflect` 自动挂到 `/api` 网关；client 侧经 `connection.rpc.call('/api', 'uiFortifier/openDshFolder')` 调用，按钮仅在 `connection.isLoopback`（本地回环）时注册到 `settings.action` 槽。
+- 思路：宿主端点复用网关反射免写 typert 生成器；远程调用结果含 `opened`/`path` 用于按钮反馈与报错文案。
+
+### settings-frame
+
+- 功能描述：让设置面板可拖动位置与缩放大小；浏览器窗口变化后面板始终限制在视野内，几何持久化到 localStorage。
+- 实现位置：[src/client/settings-frame/](../../src/client/settings-frame/)
+- 解决方案：组件注册在 `settings.action` 槽，挂载时用 `closest('[role="dialog"]')` 定位面板并改为 `position: fixed`；拖动手柄经 portal 放进标题行首、缩放柄放入面板右下角（pointer capture + rAF 节流）；最小 480x320，窗口 resize 时收窄超出视口宽高并钳位位置（窗口小于最小尺寸时不写持久化，防止临时压扁几何入库）。
+- 思路：面板几何无现成槽位承载，经 DOM 定位 + 内联样式实现；持久化参照 `dsh.conversation.contentWidth` 的 localStorage 既有做法；卸载即还原 CSS 默认样式。
 
 ### provider-label
 

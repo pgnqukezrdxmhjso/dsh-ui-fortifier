@@ -28,7 +28,7 @@ export type FortifierSettingsPageProps =
   & PropsLocale<'ui-fortifier'>
   & InjectFace<FortifierPageInjected>
 
-/** 设置页：读取配置项自动生成开关行。 */
+/** 设置页：读取配置项自动生成切换按钮行。 */
 export function FortifierSettingsPage(props: FortifierSettingsPageProps) {
   const t = props.t
   const rows = props.useToggles(value => value)
@@ -39,18 +39,24 @@ export function FortifierSettingsPage(props: FortifierSettingsPageProps) {
         <p>{t('empty')}</p>
       ) : (
         <ul className={css.list}>
-          {rows.map(row => (
-            <li key={row.field} className={css.row}>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={row.value}
-                  onChange={(event) => { props.set(row.field, event.target.checked) }}
-                />
-                <span>{t(`config.${row.field}` as UiFortifierLocaleKey)}</span>
-              </label>
-            </li>
-          ))}
+          {rows.map((row) => {
+            const label = t(`config.${row.field}` as UiFortifierLocaleKey)
+            return (
+              <li key={row.field} className={css.row}>
+                <span className={css.rowLabel}>{label}</span>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={row.value}
+                  aria-label={label}
+                  className={`${css.switch} ${row.value ? css.switchOn : ''}`}
+                  onClick={() => { props.set(row.field, !row.value) }}
+                >
+                  <span className={css.thumb} />
+                </button>
+              </li>
+            )
+          })}
         </ul>
       )}
     </div>

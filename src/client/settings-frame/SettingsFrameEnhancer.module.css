@@ -1,0 +1,79 @@
+/* 宿主锚点：仅用于向上定位面板，不参与布局。 */
+.hostAnchor {
+  display: none;
+}
+
+/* 拖动位置手柄：左上角标题行内「设置」文本左侧的六点矩阵把手。 */
+.dragHandle {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin: 0 8px 0 0;
+  padding: 0;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--dsw-alias-label-secondary);
+  cursor: grab;
+  vertical-align: middle;
+  touch-action: none;
+}
+
+.dragHandle:hover {
+  background: var(--dsw-alias-interactive-bg-hover);
+  color: var(--dsw-alias-label-primary);
+}
+
+.gripIcon {
+  width: 10px;
+  height: 14px;
+  flex: none;
+}
+
+/* 拖动大小手柄：右下角可见的双斜线缩放标志。 */
+.resizeHandle {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: nwse-resize;
+  touch-action: none;
+}
+
+.resizeHandle::before,
+.resizeHandle::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.resizeHandle::after {
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid var(--dsw-alias-label-secondary);
+  border-bottom: 2px solid var(--dsw-alias-label-secondary);
+}
+
+.resizeHandle::before {
+  width: 6px;
+  height: 6px;
+  right: 4px;
+  bottom: 4px;
+  border-right: 2px solid var(--dsw-alias-label-tertiary);
+  border-bottom: 2px solid var(--dsw-alias-label-tertiary);
+}
+
+.resizeHandle:hover::after {
+  border-color: var(--dsw-alias-label-primary);
+}

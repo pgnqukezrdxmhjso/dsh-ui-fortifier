@@ -20,13 +20,22 @@ Toggle state uses the dsh settings service three-layer resolution: schema defaul
 - Files: [src/client/index.ts](../../src/client/index.ts), [src/client/settings/FortifierSettingsPage.tsx](../../src/client/settings/FortifierSettingsPage.tsx)
 - Solution: The client binds settingsScope, reads the namespace value from the describe mirror; the toggle row list is driven by the feature-module field list, rendered per field; writes go through the settings scope's write API.
 - Approach: Adding a feature requires adding a field to the Host `Config`, an entry in `modules`, and a copy key (`config.<field>`) in `locales.ts`; the Settings page shows the new toggle automatically, with no change to the page code.
+- Layout constraints: the list content is capped at 520px wide (switches stay near their labels when the panel is dragged wide), with a 0.5px divider between adjacent options.
+- Switch styling: mirrors the official `ui-settings-plugins` Switch pattern (`role="switch"` + thumb); the thumb is a `border-radius: 50%` full circle paired with `corner-shape: round` — identical to the dsh built-in switches, as required by the ui-theme global superellipse smoothing contract (full-round shapes must pair to keep circular arcs).
 
-### provider-label
+### open-dsh-folder
 
-- Description: Shows the currently selected provider to the left of the model selector (`conversation.input.right` slot).
-- Files: [src/client/provider-label/index.ts](../../src/client/provider-label/index.ts), [src/client/provider-label/ProviderLabel.tsx](../../src/client/provider-label/ProviderLabel.tsx)
-- Solution: The component subscribes to the model-directory snapshot via the `useDirectory` inject hook and renders the current-provider field.
-- Approach: Data source is the current-provider field of the ModelDirectory store.
+- Description: Adds an "Open .dsh folder" button to the Settings header action area that opens `$DSH_HOME` in one click.
+- Files: [src/client/open-dsh-folder/](../../src/client/open-dsh-folder/), [src/open-dsh-folder.ts](../../src/open-dsh-folder.ts)
+- Solution: The Host side provides a TypertRemoteService (`uiFortifierRemote`) exposing an `openDshFolder` remote method, auto-mounted on the `/api` gateway through `ctx.reflect`; the client calls it via `connection.rpc.call('/api', 'uiFortifier/openDshFolder')`, and the button registers into the `settings.action` slot only when `connection.isLoopback`.
+- Approach: The host endpoint reuses gateway reflection so no typert generator is needed; the remote result carries `opened`/`path` for button feedback and error copy.
+
+### settings-frame
+
+- Description: Makes the Settings panel draggable and resizable; after browser window changes the panel always stays within the viewport, with geometry persisted to localStorage.
+- Files: [src/client/settings-frame/](../../src/client/settings-frame/)
+- Solution: The component registers in the `settings.action` slot, locates the panel on mount via `closest('[role="dialog"]')` and switches it to `position: fixed`; the drag handle is portaled into the header row's first slot and the resize handle into the panel's bottom-right corner (pointer capture + rAF throttle); minimum 480x320, and on window resize oversized width/height shrink and the position clamps (nothing persists while the window is below the minimum, so a transiently flattened geometry never enters storage).
+- Approach: Panel geometry has no existing slot to carry it, so it is reached through DOM lookup plus inline styles; persistence follows the existing `dsh.conversation.contentWidth` localStorage precedent; unmount restores the CSS defaults.
 
 ### Module control mechanism
 
