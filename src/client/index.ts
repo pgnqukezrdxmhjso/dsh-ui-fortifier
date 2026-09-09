@@ -11,6 +11,7 @@ import { installSettings } from './settings'
 import { installProviderLabel } from './provider-label'
 import { installOpenDshFolder } from './open-dsh-folder'
 import { installSettingsFrame } from './settings-frame'
+import { installModelPicker } from './model-picker'
 import type { UiFortifierLocaleKey } from './locales.ts'
 
 /** 一个功能模块的安装面。 */
@@ -35,7 +36,19 @@ export const modules: Record<keyof Config, ModuleEntry> = {
     module: installSettingsFrame,
     dispose: undefined,
   },
+  'model-picker': {
+    module: installModelPicker,
+    dispose: undefined,
+  },
 }
+
+/** 设置页开关行的显示顺序(按位置排序)；不在表中的字段排在其后。 */
+export const MODULE_ORDER: readonly (keyof Config)[] = [
+  'provider-label',
+  'model-picker',
+  'open-dsh-folder',
+  'settings-frame',
+]
 
 export const inject = ['slots', 'locale', 'settingsScope', 'modelDirectories', 'connection']
 
@@ -44,7 +57,7 @@ export const inject = ['slots', 'locale', 'settingsScope', 'modelDirectories', '
  * @param ctx - 需已提供 slots/locale/settingsScope/modelDirectories/connection 的客户端上下文。
  */
 export function apply(ctx: Context): void {
-  const scope = installSettings(ctx, Object.keys(modules))
+  const scope = installSettings(ctx, MODULE_ORDER)
 
   // 子模块不感知开关：index 据开关状态动态注册/卸载。
   for (const field of Object.keys(modules) as (keyof Config)[]) {

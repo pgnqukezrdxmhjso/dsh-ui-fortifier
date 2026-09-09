@@ -15,6 +15,8 @@ export interface Config {
   'open-dsh-folder': boolean
   /** 设置面板可拖动位置与大小。 */
   'settings-frame': boolean
+  /** 输入框右侧显示级联模型选择器(先选提供商、再选模型)。 */
+  'model-picker': boolean
 }
 
 /** 插件配置 schema。 */
@@ -22,6 +24,7 @@ export const Config: z<Config> = z.object({
   'provider-label': z.boolean().default(true),
   'open-dsh-folder': z.boolean().default(true),
   'settings-frame': z.boolean().default(true),
+  'model-picker': z.boolean().default(true),
 })
 
 /**
