@@ -13,10 +13,10 @@ export const UI_FORTIFIER = 'ui-fortifier'
 /**
  * 注册设置页并绑定功能开关的 settings 作用域。
  * @param ctx - 需已提供 slots/locale/settingsScope 的客户端上下文。
- * @param moduleFields - 功能模块字段列表(settings 开关 key),由调用方传入。
+ * @param moduleOrder - 功能模块字段的显示顺序(settings 开关 key)。
  * @returns 功能开关的 settings 绑定,供调用方控制子模块注册。
  */
-export function installSettings(ctx: ClientContext, moduleFields: readonly string[]): SettingsScope<Config> {
+export function installSettings(ctx: ClientContext, moduleOrder: readonly string[]): SettingsScope<Config> {
   ctx.effect(() => ctx.locale.register(UI_FORTIFIER, { zh, en }), 'dsh-ui-fortifier: copy dictionaries')
   const scope = ctx.settingsScope.bind<Config>({ namespace: UI_FORTIFIER })
   const mirror = ctx.settingsScope.describe()
@@ -33,7 +33,7 @@ export function installSettings(ctx: ClientContext, moduleFields: readonly strin
           getSnapshot: (): readonly FortifierToggleRow[] => {
             const current = view()
             const value = (current?.value ?? {}) as Record<string, boolean>
-            const rows = moduleFields.map(field => ({ field, value: value[field] ?? true }))
+            const rows = moduleOrder.map(field => ({ field, value: value[field] ?? true }))
             // 稳定引用：HostObservable 契约要求 getSnapshot 在数据不变时返回同一引用。
             const signature = JSON.stringify(rows)
             if (signature !== cachedSignature) {

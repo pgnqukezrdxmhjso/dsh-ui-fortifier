@@ -23,6 +23,7 @@ dsh plugin --profile web add dsh-ui-fortifier
 | 功能 | 描述 |
 | --- | --- |
 | provider-label | 在模型选择按钮左侧显示当前选择的提供方。 |
+| model-picker | 输入行模型选择器旁提供级联模型选择器（提供商 → 模型）。 |
 | open-dsh-folder | 在设置页右上角「打开配置文件」旁增加「打开 .dsh 文件夹」。 |
 | settings-frame | 设置面板可拖动位置与拖动大小。 |
 
