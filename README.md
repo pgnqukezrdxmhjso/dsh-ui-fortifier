@@ -23,10 +23,11 @@ Adds a "ui-fortifier" tab in Settings to toggle every feature module of this plu
 | Feature | Description |
 | --- | --- |
 | provider-label | Shows the currently selected provider to the left of the model selector. |
+| open-dsh-folder | Adds an "Open .dsh folder" button next to "Open configuration file" at the top-right of the Settings page. |
 
 ## dsh version used for development
 
-- Target dsh version: `0.1.2-rc.1`; `@deepseek-ai/dsh-*` dependencies use `workspace:^`.
+- dsh version used for development: `0.1.2-rc.1`. `@deepseek-ai/dsh-*` dependencies use `workspace:^`.
 
 ## Secondary Development
 
