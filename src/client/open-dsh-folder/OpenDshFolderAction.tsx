@@ -5,7 +5,7 @@ import { Button } from '@deepseek-ai/dsh-client-ui-primitives'
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 import type { ConnectionRpcResult } from '@deepseek-ai/dsh-client-connection/client'
-import type { DshFolderOpenValue } from '../../open-dsh-folder.ts'
+import type { DshFolderOpenValue } from '../../types.ts'
 import css from './OpenDshFolderAction.module.css'
 
 /** 打开 .dsh 文件夹的注入面。 */
