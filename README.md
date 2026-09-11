@@ -38,7 +38,7 @@ Clone this repository into a dsh workspace package directory, then install and b
 ```sh
 git clone https://github.com/pgnqukezrdxmhjso/dsh-ui-fortifier packages/my/dsh-ui-fortifier
 pnpm install
-pnpm --filter dsh-ui-fortifier bundle
+pnpm --filter dsh-ui-fortifier build
 ```
 
 ---
