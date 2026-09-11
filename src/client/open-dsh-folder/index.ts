@@ -3,7 +3,7 @@
  */
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import type { ConnectionHandle, ConnectionRpcResult } from '@deepseek-ai/dsh-client-connection/client'
-import type { DshFolderOpenValue } from '../../open-dsh-folder.ts'
+import type { DshFolderOpenValue } from '../../types.ts'
 import { OpenDshFolderAction } from './OpenDshFolderAction.tsx'
 
 export type { OpenDshFolderActionProps, OpenDshFolderInjected } from './OpenDshFolderAction.tsx'

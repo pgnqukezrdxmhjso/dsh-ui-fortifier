@@ -29,7 +29,7 @@ Adds a "ui-fortifier" tab in Settings to toggle every feature module of this plu
 
 ## dsh version used for development
 
-- dsh version used for development: `0.1.2-rc.1`. `@deepseek-ai/dsh-*` dependencies use `workspace:^`.
+- dsh version used for development: `0.1.5-rc.2`. `@deepseek-ai/dsh-*` dependencies use `workspace:^`.
 
 ## Secondary Development
 
@@ -40,3 +40,7 @@ git clone https://github.com/pgnqukezrdxmhjso/dsh-ui-fortifier packages/my/dsh-u
 pnpm install
 pnpm --filter dsh-ui-fortifier bundle
 ```
+
+---
+
+No runtime invariant companion is published because this package is a pure slot surface: it registers slots, a settings namespace, and one Remote endpoint, and owns no event stream or mutable state to assert.

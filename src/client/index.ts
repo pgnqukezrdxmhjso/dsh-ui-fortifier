@@ -1,11 +1,15 @@
 import type { Context } from '@deepseek-ai/cordis'
-import type { Config } from '../index'
+import type { Config } from '../types.ts'
 // Type-only：拉取 ui-settings 的 Context merge（ctx.settingsScope）与 settings.section 插槽声明。
 import type { } from '@deepseek-ai/dsh-client-ui-settings/client'
 // Type-only：拉取 locale 的 Context merge（ctx.locale）。
 import type { } from '@deepseek-ai/dsh-client-locale/client'
 // Type-only：拉取 renderer 的 Context merge（ctx.slots）。
 import type { } from '@deepseek-ai/dsh-client-ui-renderer/client'
+// Type-only：拉取 api-session-controller 的 Context merge（ctx.sessions）。
+import type { } from '@deepseek-ai/dsh-api-session-controller/client'
+// Type-only：拉取 remotes 的 Context merge（ctx.remote / ctx.remote.session）。
+import type { } from '@deepseek-ai/dsh-api-remotes/client'
 import type { } from '@deepseek-ai/dsh-session/types'
 import { installSettings } from './settings'
 import { installProviderLabel } from './provider-label'
@@ -50,11 +54,18 @@ export const MODULE_ORDER: readonly (keyof Config)[] = [
   'settings-frame',
 ]
 
-export const inject = ['slots', 'locale', 'settingsScope', 'modelDirectories', 'connection']
+// 0.1.5 起服务方法在**调用方 Context** 下运行：`ctx.modelDirectories.directoryFor()`
+// 内部读 this.ctx.sessions / this.ctx.remote.session（该服务自身声明了
+// ['sessions','remote','remote.session']），故调用方必须同样声明，否则抛出
+// `cannot get property "remote.session" without inject`。
+export const inject = [
+  'slots', 'locale', 'settingsScope', 'modelDirectories', 'connection',
+  'sessions', 'remote', 'remote.session',
+]
 
 /**
  * 客户端插件体：注册设置页并据开关状态挂载各功能模块。
- * @param ctx - 需已提供 slots/locale/settingsScope/modelDirectories/connection 的客户端上下文。
+ * @param ctx - 需已提供 slots/locale/settingsScope/modelDirectories/connection/sessions/remote 的客户端上下文。
  */
 export function apply(ctx: Context): void {
   const scope = installSettings(ctx, MODULE_ORDER)

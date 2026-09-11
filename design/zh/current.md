@@ -10,6 +10,10 @@ DSH Web UI 强化插件：在设置页提供功能模块开关，并显示当前
 
 开关状态采用 dsh settings 服务三层解析：schema 默认值 → base 层（插件配置 cordis.yml 默认值）→ user 层（用户设置页覆盖）。
 
+两面各有独立编译面（`tsconfig.host.json` 走 node 全局、`tsconfig.client.json` 走浏览器全局），根 `tsconfig.json` 仅作 solution 聚合；两面共享的类型集中在 `src/types.ts`（仅类型、无运行时代码），因此 client 面不引用 host 文件。
+
+dsh 0.1.5 起服务方法在**调用方 Context** 下运行：client 插件调用 `ctx.modelDirectories.directoryFor()` 时，`this.ctx` 是本插件的 fiber，而该方法内部要读 `this.ctx.sessions` / `this.ctx.remote.session`，因此 client `inject` 必须与官方 `ui-model-selection` 同样声明 `sessions` / `remote` / `remote.session`，否则报 `cannot get property "remote.session" without inject`。
+
 ## todo
 
 ## 功能
@@ -42,7 +46,8 @@ DSH Web UI 强化插件：在设置页提供功能模块开关，并显示当前
 - 功能描述：在设置页右上角操作区增加「打开 .dsh 文件夹」按钮，一键打开 `$DSH_HOME` 目录。
 - 实现位置：[src/client/open-dsh-folder/](../../src/client/open-dsh-folder/)、[src/open-dsh-folder.ts](../../src/open-dsh-folder.ts)
 - 解决方案：host 侧提供 TypertRemoteService（`uiFortifierRemote`）暴露 `openDshFolder` 远程方法，经 `ctx.reflect` 自动挂到 `/api` 网关；client 侧经 `connection.rpc.call('/api', 'uiFortifier/openDshFolder')` 调用，按钮仅在 `connection.isLoopback`（本地回环）时注册到 `settings.action` 槽。
-- 思路：宿主端点复用网关反射免写 typert 生成器；远程调用结果含 `opened`/`path` 用于按钮反馈与报错文案。
+- Windows 前台激活：共享的 `openNativePath` 只执行 `Invoke-Item`，而窗口由 explorer 创建、宿主又在后台，Windows 拒绝其前置，窗口会落到浏览器后面（dsh 自带按钮同样如此）。故 Windows 分支改走自写 PowerShell：打开后按 `LocationURL` 匹配该文件夹的 explorer 窗口取 `HWND`，合成 Alt 按放取得激活资格，再 `SetForegroundWindow` 置顶；非 Windows 仍用共享 `openNativePath`。
+- 思路：宿主端点复用网关反射免写 typert 生成器；远程调用结果含 `opened`/`path` 用于按钮反馈与报错文案；前台激活沿用 harness 原生文件夹对话框已验证的 Alt 合成思路，因目标窗口归 explorer 所有而额外显式置顶。
 
 ### settings-frame
 

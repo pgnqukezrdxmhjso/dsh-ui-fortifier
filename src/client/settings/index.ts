@@ -1,6 +1,6 @@
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import type { SettingsScope } from '@deepseek-ai/dsh-client-ui-settings/client'
-import type { Config } from '../../index'
+import type { Config } from '../../types.ts'
 import type { FortifierToggleRow } from './FortifierSettingsPage.tsx'
 import { FortifierSettingsPage } from './FortifierSettingsPage.tsx'
 import { en, zh } from '../locales.ts'

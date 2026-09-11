@@ -10,6 +10,10 @@ The plugin has a Host half and a client half. The Host half registers the `ui-fo
 
 Toggle state uses the dsh settings service three-layer resolution: schema defaults → `base` layer (plugin config cordis.yml defaults) → `user` layer (user Settings UI override).
 
+Each half has its own compiler face (`tsconfig.host.json` sees node globals, `tsconfig.client.json` sees browser globals) with the root `tsconfig.json` as a solution-only aggregate; types shared by both halves live in `src/types.ts` (types only, no runtime code), so the client face references no host file.
+
+Since dsh 0.1.5, service methods run under the **caller's Context**: when the client plugin calls `ctx.modelDirectories.directoryFor()`, `this.ctx` is this plugin's fiber, and that method reads `this.ctx.sessions` / `this.ctx.remote.session` internally — so the client `inject` must declare `sessions` / `remote` / `remote.session` exactly as the official `ui-model-selection` does, or it raises `cannot get property "remote.session" without inject`.
+
 ## todo
 
 ## Features
@@ -42,7 +46,8 @@ Toggle state uses the dsh settings service three-layer resolution: schema defaul
 - Description: Adds an "Open .dsh folder" button to the Settings header action area that opens `$DSH_HOME` in one click.
 - Files: [src/client/open-dsh-folder/](../../src/client/open-dsh-folder/), [src/open-dsh-folder.ts](../../src/open-dsh-folder.ts)
 - Solution: The Host side provides a TypertRemoteService (`uiFortifierRemote`) exposing an `openDshFolder` remote method, auto-mounted on the `/api` gateway through `ctx.reflect`; the client calls it via `connection.rpc.call('/api', 'uiFortifier/openDshFolder')`, and the button registers into the `settings.action` slot only when `connection.isLoopback`.
-- Approach: The host endpoint reuses gateway reflection so no typert generator is needed; the remote result carries `opened`/`path` for button feedback and error copy.
+- Windows foreground activation: the shared `openNativePath` runs only `Invoke-Item`, and since explorer creates the window while the host runs in the background, Windows refuses to bring it forward and it lands behind the browser (dsh's own button behaves the same). The Windows branch therefore runs its own PowerShell: after opening, match that folder's explorer window by `LocationURL` to read its `HWND`, synthesize an Alt press/release to become eligible, then call `SetForegroundWindow`. Non-Windows platforms keep the shared `openNativePath`.
+- Approach: The host endpoint reuses gateway reflection so no typert generator is needed; the remote result carries `opened`/`path` for button feedback and error copy; foreground activation reuses the Alt-synthesis technique harness already validates in its native folder dialog, adding an explicit raise because the target window belongs to explorer.
 
 ### settings-frame
 

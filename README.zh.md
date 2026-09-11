@@ -29,7 +29,7 @@ dsh plugin --profile web add dsh-ui-fortifier
 
 ## 构建时使用的 dsh 版本
 
-- 构建时使用的 dsh 版本：`0.1.2-rc.1`；`@deepseek-ai/dsh-*` 依赖使用 `workspace:^`。
+- 构建时使用的 dsh 版本：`0.1.5-rc.2`；`@deepseek-ai/dsh-*` 依赖使用 `workspace:^`。
 
 ## 二次开发说明
 
@@ -40,3 +40,7 @@ git clone https://github.com/pgnqukezrdxmhjso/dsh-ui-fortifier packages/my/dsh-u
 pnpm install
 pnpm --filter dsh-ui-fortifier bundle
 ```
+
+---
+
+本包不发布运行时 invariant 伴生入口：它是纯插槽表面，只注册插槽、一个 settings 命名空间和一个 Remote 端点，没有自有事件流或可变状态可供断言。
