@@ -256,7 +256,7 @@ export function ModelPicker(props: ModelPickerProps) {
   }
 
   const chooseModel = (modelId: string): void => {
-    if (!activeProvider) return
+    if (activeProvider === null) return
     const model = activeGroup?.models.find(m => m.id === modelId)
     if (!model) return
     const selection: ModelSelection = {
@@ -274,7 +274,7 @@ export function ModelPicker(props: ModelPickerProps) {
     })
   }
 
-  const hasError = Boolean(state.error) || Boolean(picker.error)
+  const hasError = state.error !== null || picker.error !== null
   const shownError = state.error ?? picker.error
 
   return (
@@ -358,7 +358,7 @@ export function ModelPicker(props: ModelPickerProps) {
                   </button>
                 </div>
               )}
-              {!activeProvider
+              {activeProvider === null
                 ? <div className={css.status}>{t('modelPicker.emptyModels')}</div>
                 : activeModels.length === 0
                   ? <div className={css.status}>{t('modelPicker.emptyModels')}</div>

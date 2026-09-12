@@ -33,12 +33,12 @@ type OpenState =
  * @returns 操作按钮及其结果提示。
  */
 export function OpenDshFolderAction(props: OpenDshFolderActionProps): ReactNode {
-  const { openDshFolder, t } = props
+  const t = props.t
   const [state, setState] = useState<OpenState>({ kind: 'idle' })
 
   const open = async (): Promise<void> => {
     setState({ kind: 'opening' })
-    const result = await openDshFolder()
+    const result = await props.openDshFolder()
     if (!result.ok) {
       setState({ kind: 'error' })
       return
