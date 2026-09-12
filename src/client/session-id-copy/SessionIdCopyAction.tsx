@@ -40,8 +40,8 @@ function HashGlyph() {
  * @returns 会话标题栏工具区的复制按钮。
  */
 export function SessionIdCopyAction(props: SessionIdCopyActionProps) {
-  const { sessionId, t } = props
-  const id = String(sessionId)
+  const t = props.t
+  const id = props.sessionId
   const [copied, setCopied] = useState(false)
   const pending = useRef(false)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -51,7 +51,7 @@ export function SessionIdCopyAction(props: SessionIdCopyActionProps) {
   useEffect(() => () => {
     epoch.current += 1
     pending.current = false
-    if (timer.current !== null) clearTimeout(timer.current)
+    if (timer.current) clearTimeout(timer.current)
   }, [])
 
   const copy = (): void => {

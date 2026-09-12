@@ -44,7 +44,7 @@ interface PanelGeometry {
 /** 读取持久化的面板几何；缺失或损坏返回 undefined。 */
 function readFrameGeometry(): PanelGeometry | undefined {
   const raw = localStorage.getItem(FRAME_STORAGE_KEY)
-  if (raw === null) return undefined
+  if (!raw) return undefined
   try {
     const parsed = JSON.parse(raw) as Partial<PanelGeometry>
     if (typeof parsed.left === 'number' && Number.isFinite(parsed.left)
@@ -137,16 +137,16 @@ export function SettingsFrameEnhancer(props: SettingsFrameEnhancerProps): ReactN
   // 挂载时把面板从 flex 居中改为 fixed，应用持久化几何或保持当前视觉位置；卸载时还原。
   useEffect(() => {
     const anchor = anchorRef.current
-    if (anchor === null) return
+    if (!anchor) return
     const dialog = anchor.closest('[role="dialog"]')
     if (!(dialog instanceof HTMLElement)) return
     const rect = dialog.getBoundingClientRect()
     const saved = readFrameGeometry()
     dialog.style.position = 'fixed'
-    dialog.style.left = `${saved === undefined ? rect.left : saved.left}px`
-    dialog.style.top = `${saved === undefined ? rect.top : saved.top}px`
-    dialog.style.width = `${saved === undefined ? rect.width : saved.width}px`
-    dialog.style.height = `${saved === undefined ? rect.height : saved.height}px`
+    dialog.style.left = `${saved ? saved.left : rect.left}px`
+    dialog.style.top = `${saved ? saved.top : rect.top}px`
+    dialog.style.width = `${saved ? saved.width : rect.width}px`
+    dialog.style.height = `${saved ? saved.height : rect.height}px`
     // flex 居中依赖父容器，fixed 后需清除可能继承的 margin。
     dialog.style.margin = '0'
     // 面板 CSS 自带 max-width: calc(100vw - 48px)，会截断内联 width，
@@ -170,7 +170,7 @@ export function SettingsFrameEnhancer(props: SettingsFrameEnhancerProps): ReactN
     // 但这只是临时视觉状态，不持久化，避免下次打开读到被压扁的几何。
     let windowResizeFrame: number | null = null
     const onWindowResize = (): void => {
-      if (windowResizeFrame !== null) return
+      if (windowResizeFrame) return
       windowResizeFrame = requestAnimationFrame(() => {
         windowResizeFrame = null
         constrainToViewport(dialog)
@@ -181,7 +181,7 @@ export function SettingsFrameEnhancer(props: SettingsFrameEnhancerProps): ReactN
     }
     window.addEventListener('resize', onWindowResize)
     return () => {
-      if (windowResizeFrame !== null) { cancelAnimationFrame(windowResizeFrame); windowResizeFrame = null }
+      if (windowResizeFrame) { cancelAnimationFrame(windowResizeFrame); windowResizeFrame = null }
       window.removeEventListener('resize', onWindowResize)
       dialog.style.position = ''
       dialog.style.left = ''
@@ -198,7 +198,7 @@ export function SettingsFrameEnhancer(props: SettingsFrameEnhancerProps): ReactN
   // portal 默认追加到标题文字之后；把拖动手柄移动到标题行首，置于「设置」文本左侧。
   useEffect(() => {
     const handle = dragHandleRef.current
-    if (handle === null || headerRow === null) return
+    if (!handle || !headerRow) return
     if (headerRow.firstChild === handle) return
     headerRow.insertBefore(handle, headerRow.firstChild)
   }, [headerRow])
@@ -209,7 +209,7 @@ export function SettingsFrameEnhancer(props: SettingsFrameEnhancerProps): ReactN
   const frame = useRef<number | null>(null)
 
   const onDragPointerDown = (event: React.PointerEvent<HTMLButtonElement>): void => {
-    if (panel === null) return
+    if (!panel) return
     event.preventDefault()
     event.currentTarget.setPointerCapture(event.pointerId)
     dragState.current = {
@@ -219,11 +219,11 @@ export function SettingsFrameEnhancer(props: SettingsFrameEnhancerProps): ReactN
   }
 
   const onDragPointerMove = (event: React.PointerEvent<HTMLButtonElement>): void => {
-    if (dragState.current === null) return
+    if (!dragState.current) return
     latest.current = { x: event.clientX, y: event.clientY }
     frame.current ??= requestAnimationFrame(() => {
       frame.current = null
-      if (panel === null || dragState.current === null) return
+      if (!panel || !dragState.current) return
       panel.style.left = `${latest.current.x - dragState.current.offsetX}px`
       panel.style.top = `${latest.current.y - dragState.current.offsetY}px`
       constrainPanel(panel)
@@ -231,11 +231,11 @@ export function SettingsFrameEnhancer(props: SettingsFrameEnhancerProps): ReactN
   }
 
   const onDragPointerUp = (event: React.PointerEvent<HTMLButtonElement>): void => {
-    if (dragState.current === null) return
-    if (frame.current !== null) { cancelAnimationFrame(frame.current); frame.current = null }
+    if (!dragState.current) return
+    if (frame.current) { cancelAnimationFrame(frame.current); frame.current = null }
     dragState.current = null
     event.currentTarget.releasePointerCapture(event.pointerId)
-    if (panel === null) return
+    if (!panel) return
     constrainPanel(panel)
     persistGeometry(panel)
   }
@@ -247,7 +247,7 @@ export function SettingsFrameEnhancer(props: SettingsFrameEnhancerProps): ReactN
   const resizeFrame = useRef<number | null>(null)
 
   const onResizePointerDown = (event: React.PointerEvent<HTMLButtonElement>): void => {
-    if (panel === null) return
+    if (!panel) return
     event.preventDefault()
     event.stopPropagation()
     event.currentTarget.setPointerCapture(event.pointerId)
@@ -261,11 +261,11 @@ export function SettingsFrameEnhancer(props: SettingsFrameEnhancerProps): ReactN
   }
 
   const onResizePointerMove = (event: React.PointerEvent<HTMLButtonElement>): void => {
-    if (resizeOrigin.current === null || resizeBase.current === null || resizeMax.current === null) return
+    if (!resizeOrigin.current || !resizeBase.current || !resizeMax.current) return
     latest.current = { x: event.clientX, y: event.clientY }
     resizeFrame.current ??= requestAnimationFrame(() => {
       resizeFrame.current = null
-      if (panel === null || resizeOrigin.current === null || resizeBase.current === null || resizeMax.current === null) return
+      if (!panel || !resizeOrigin.current || !resizeBase.current || !resizeMax.current) return
       const width = clamp(
         resizeBase.current.width + (latest.current.x - resizeOrigin.current.x),
         MIN_WIDTH,
@@ -284,12 +284,12 @@ export function SettingsFrameEnhancer(props: SettingsFrameEnhancerProps): ReactN
   }
 
   const onResizePointerUp = (event: React.PointerEvent<HTMLButtonElement>): void => {
-    if (resizeOrigin.current === null) return
-    if (resizeFrame.current !== null) { cancelAnimationFrame(resizeFrame.current); resizeFrame.current = null }
+    if (!resizeOrigin.current) return
+    if (resizeFrame.current) { cancelAnimationFrame(resizeFrame.current); resizeFrame.current = null }
     resizeOrigin.current = null
     resizeBase.current = null
     event.currentTarget.releasePointerCapture(event.pointerId)
-    if (panel !== null) persistGeometry(panel)
+    if (panel) persistGeometry(panel)
   }
 
   const dragHandle = (
@@ -323,8 +323,8 @@ export function SettingsFrameEnhancer(props: SettingsFrameEnhancerProps): ReactN
     <>
       {/* 宿主锚点：仅用于定位面板，不参与布局。 */}
       <span ref={anchorRef} className={css.hostAnchor} />
-      {headerRow !== null && createPortal(dragHandle, headerRow)}
-      {panel !== null && createPortal(resizeHandle, panel)}
+      {headerRow && createPortal(dragHandle, headerRow)}
+      {panel && createPortal(resizeHandle, panel)}
     </>
   )
 }

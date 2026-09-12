@@ -55,7 +55,7 @@ function matchesQuery(name: string, query: string): boolean {
  * @param target - 目标元素，缺失(如已被搜索过滤掉)时不处理。
  */
 function scrollIntoViewWithin(container: HTMLElement | null, target: HTMLElement | null): void {
-  if (container === null || target === null) return
+  if (!container || !target) return
   const containerRect = container.getBoundingClientRect()
   const targetRect = target.getBoundingClientRect()
   if (targetRect.top < containerRect.top) {
@@ -98,7 +98,7 @@ function useRightAlignedMenuPosition(
     }
     const place = (): void => {
       const rect = anchorRef.current?.getBoundingClientRect()
-      if (rect === undefined) return
+      if (!rect) return
       const panel = panelRef.current
       const width = panel?.offsetWidth ?? 0
       const height = panel?.offsetHeight ?? 0
@@ -116,7 +116,7 @@ function useRightAlignedMenuPosition(
     // 面板自身尺寸也会变(如错误条出现)，陈旧坐标会让它越过该守的边距。
     const panel = panelRef.current
     let observer: ResizeObserver | null = null
-    if (typeof ResizeObserver !== 'undefined' && panel !== null) {
+    if (typeof ResizeObserver !== 'undefined' && panel) {
       observer = new ResizeObserver(place)
       observer.observe(panel)
     }
@@ -178,7 +178,7 @@ export function ModelPicker(props: ModelPickerProps) {
   const activeGroup = holding ?? visibleGroups[0]
   const activeProvider = activeGroup?.id ?? null
   const activeModels = useMemo(() => {
-    if (activeGroup === undefined) return []
+    if (!activeGroup) return []
     if (query === '') return activeGroup.models
     if (hasModelHit) return activeGroup.models.filter(model => matchesQuery(model.name, query))
     return activeGroup.models
@@ -196,14 +196,14 @@ export function ModelPicker(props: ModelPickerProps) {
     // positionedRef 守卫之前——展开时的首次定位已把该守卫置为 true。
     if (pendingCurrentScrollRef.current) {
       // 该提供商的模型列表尚未渲染出当前模型时保持待定，渲染完成后本效果会再跑。
-      if (currentModelRef.current === null) return
+      if (!currentModelRef.current) return
       scrollIntoViewWithin(modelsRef.current, currentModelRef.current)
       pendingCurrentScrollRef.current = false
       return
     }
     if (positionedRef.current) return
     // 目录异步到达时两列都还没有目标，保持未定位，数据落地后本效果会再跑。
-    if (currentProviderRef.current === null && currentModelRef.current === null) return
+    if (!currentProviderRef.current && !currentModelRef.current) return
     scrollIntoViewWithin(providersRef.current, currentProviderRef.current)
     scrollIntoViewWithin(modelsRef.current, currentModelRef.current)
     positionedRef.current = true
@@ -252,13 +252,13 @@ export function ModelPicker(props: ModelPickerProps) {
     }
     pendingCurrentScrollRef.current = false
     // 模型列容器在提供商切换间复用同一 DOM 节点，React 不会重置其滚动位置。
-    if (modelsRef.current !== null) modelsRef.current.scrollTop = 0
+    if (modelsRef.current) modelsRef.current.scrollTop = 0
   }
 
   const chooseModel = (modelId: string): void => {
-    if (activeProvider === null) return
+    if (!activeProvider) return
     const model = activeGroup?.models.find(m => m.id === modelId)
-    if (model === undefined) return
+    if (!model) return
     const selection: ModelSelection = {
       provider: activeProvider,
       model: modelId,
@@ -274,7 +274,7 @@ export function ModelPicker(props: ModelPickerProps) {
     })
   }
 
-  const hasError = state.error !== null || picker.error !== null
+  const hasError = Boolean(state.error) || Boolean(picker.error)
   const shownError = state.error ?? picker.error
 
   return (
@@ -358,7 +358,7 @@ export function ModelPicker(props: ModelPickerProps) {
                   </button>
                 </div>
               )}
-              {activeProvider === null
+              {!activeProvider
                 ? <div className={css.status}>{t('modelPicker.emptyModels')}</div>
                 : activeModels.length === 0
                   ? <div className={css.status}>{t('modelPicker.emptyModels')}</div>
