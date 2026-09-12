@@ -50,7 +50,7 @@
     "pub": "pnpm run build && pnpm login --registry=https://registry.npmjs.org && pnpm publish --registry=https://registry.npmjs.org --no-git-checks",
     "pack": "pnpm run build && pnpm pack --pack-destination lib",
     "pack-test-i": "pnpm run pack && (pnpm dsh plugin --profile pkgtest remove %npm_package_name% & pnpm dsh plugin --profile pkgtest add ./lib/%npm_package_name%-%npm_package_version%.tgz)",
-    "npm-test-i": "pnpm dsh plugin --profile pkgtest remove %npm_package_name% & pnpm dsh plugin --profile pkgtest add %npm_package_name%@%npm_package_version%",
+    "npm-test-i": "pnpm dsh plugin --profile pkgtest remove %npm_package_name% & pnpm dsh plugin --profile pkgtest add --registry=https://registry.npmjs.org %npm_package_name%@%npm_package_version%",
     "test-create": "pnpm dsh --profile pkgtest --from-default-profile web",
     "test-start": "pnpm dsh --profile pkgtest --port 3081 --no-open"
   },
