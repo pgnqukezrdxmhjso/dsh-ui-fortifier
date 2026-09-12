@@ -3,7 +3,9 @@
  * 左列提供商、右列该提供商的模型；顶部搜索框按名称过滤提供商与模型。
  * 选择写回官方共享的 modelDirectories，因此与官方模型选择按钮/斜杠命令互通。
  */
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import type { CSSProperties, RefObject } from 'react'
 import type { ModelSelection } from '@deepseek-ai/dsh-api-session-controller/types'
 import type {
   HostObservable, InjectFace, PropsLocale, PropsRuntime,
@@ -47,6 +49,87 @@ function matchesQuery(name: string, query: string): boolean {
 }
 
 /**
+ * 在滚动容器内把目标滚进视野。只调整容器自身的 scrollTop，不联动页面滚动，
+ * 因此面板浮在 body 上时不会带动背景页面。
+ * @param container - 滚动容器，缺失时不处理。
+ * @param target - 目标元素，缺失(如已被搜索过滤掉)时不处理。
+ */
+function scrollIntoViewWithin(container: HTMLElement | null, target: HTMLElement | null): void {
+  if (container === null || target === null) return
+  const containerRect = container.getBoundingClientRect()
+  const targetRect = target.getBoundingClientRect()
+  if (targetRect.top < containerRect.top) {
+    container.scrollTop -= containerRect.top - targetRect.top
+    return
+  }
+  if (targetRect.bottom > containerRect.bottom) {
+    container.scrollTop += targetRect.bottom - containerRect.bottom
+  }
+}
+
+/**
+ * 未定位态：隐藏但按原点参与布局，使首帧 offsetWidth/offsetHeight 为真实尺寸，
+ * 定位不存在时也不会闪现在原点(与官方 ModelSelect 同法)。
+ */
+const MEASURE_STYLE: CSSProperties = { visibility: 'hidden', left: 0, top: 0 }
+
+/**
+ * 面板坐标：右边缘对齐触发按钮右边缘，仅当这样越出视口时才平移回边界内。
+ * 官方 useAnchoredPosition 固定以触发器左边缘为起点且无对齐选项，故本地实现。
+ * @param open - 面板是否展开；关闭时清空坐标。
+ * @param anchorRef - 触发按钮。
+ * @param panelRef - 面板，用于量取自身尺寸做视口钳位。
+ * @param gap - 面板下边缘与触发器上边缘的间距。
+ * @param margin - 面板与视口各边的最小距离。
+ * @returns 面板的 fixed 坐标；首次量取前为 null。
+ */
+function useRightAlignedMenuPosition(
+  open: boolean,
+  anchorRef: RefObject<HTMLElement | null>,
+  panelRef: RefObject<HTMLElement | null>,
+  gap: number,
+  margin: number,
+): CSSProperties | null {
+  const [position, setPosition] = useState<CSSProperties | null>(null)
+  useLayoutEffect(() => {
+    if (!open) {
+      setPosition(null)
+      return
+    }
+    const place = (): void => {
+      const rect = anchorRef.current?.getBoundingClientRect()
+      if (rect === undefined) return
+      const panel = panelRef.current
+      const width = panel?.offsetWidth ?? 0
+      const height = panel?.offsetHeight ?? 0
+      // 右对齐：左缘由触发器右缘回退一个面板宽度。
+      let left = rect.right - width
+      let top = rect.top - gap - height
+      if (width > 0) left = Math.min(Math.max(left, margin), window.innerWidth - width - margin)
+      if (height > 0) top = Math.min(Math.max(top, margin), window.innerHeight - height - margin)
+      setPosition({ left, top })
+    }
+    // 首次量取与面板挂载同一提交，钳位用的是真实尺寸而非 0。
+    place()
+    window.addEventListener('scroll', place, true)
+    window.addEventListener('resize', place)
+    // 面板自身尺寸也会变(如错误条出现)，陈旧坐标会让它越过该守的边距。
+    const panel = panelRef.current
+    let observer: ResizeObserver | null = null
+    if (typeof ResizeObserver !== 'undefined' && panel !== null) {
+      observer = new ResizeObserver(place)
+      observer.observe(panel)
+    }
+    return () => {
+      observer?.disconnect()
+      window.removeEventListener('scroll', place, true)
+      window.removeEventListener('resize', place)
+    }
+  }, [open, anchorRef, panelRef, gap, margin])
+  return position
+}
+
+/**
  * 渲染级联模型选择器(左列提供商、右列模型)。
  * @param props - owner 参数、文案与注入面。
  * @returns 图标触发器按钮与展开时的两列面板。
@@ -58,7 +141,20 @@ export function ModelPicker(props: ModelPickerProps) {
   const [loading, setLoading] = useState(false)
   const rootRef = useRef<HTMLDivElement | null>(null)
   const triggerRef = useRef<HTMLButtonElement | null>(null)
+  const menuRef = useRef<HTMLDivElement | null>(null)
+  const providersRef = useRef<HTMLElement | null>(null)
+  const modelsRef = useRef<HTMLElement | null>(null)
+  const currentProviderRef = useRef<HTMLButtonElement | null>(null)
+  const currentModelRef = useRef<HTMLButtonElement | null>(null)
   const searchRef = useRef<HTMLInputElement | null>(null)
+  // 每次展开只自动定位一次，用户随后手动滚动不会被拽回。
+  const positionedRef = useRef(false)
+  // 切回当前模型所属提供商后，待下一次渲染完成再定位到当前模型。
+  const pendingCurrentScrollRef = useRef(false)
+
+  // 面板经 portal 挂到 body(脱离列的 overflow 裁切)：右边缘对齐触发器、
+  // 向上展开，坐标随滚动/缩放重算并钳在视口内。
+  const position = useRightAlignedMenuPosition(picker.open, triggerRef, menuRef, 8, 12)
 
   const groups = state.groups
   const current = state.current
@@ -88,13 +184,40 @@ export function ModelPicker(props: ModelPickerProps) {
     return activeGroup.models
   }, [activeGroup, query, hasModelHit])
 
-  // 展开时点击面板外关闭。
+  // 展开后把当前选择滚进视野：左列当前提供商、右列当前模型。
+  // 用 useLayoutEffect 在绘制前定位，面板不会先停在顶部再跳。
+  useLayoutEffect(() => {
+    if (!picker.open) {
+      positionedRef.current = false
+      pendingCurrentScrollRef.current = false
+      return
+    }
+    // 切回当前模型所属提供商：定位到当前模型(而非停在顶部)。此分支必须在
+    // positionedRef 守卫之前——展开时的首次定位已把该守卫置为 true。
+    if (pendingCurrentScrollRef.current) {
+      // 该提供商的模型列表尚未渲染出当前模型时保持待定，渲染完成后本效果会再跑。
+      if (currentModelRef.current === null) return
+      scrollIntoViewWithin(modelsRef.current, currentModelRef.current)
+      pendingCurrentScrollRef.current = false
+      return
+    }
+    if (positionedRef.current) return
+    // 目录异步到达时两列都还没有目标，保持未定位，数据落地后本效果会再跑。
+    if (currentProviderRef.current === null && currentModelRef.current === null) return
+    scrollIntoViewWithin(providersRef.current, currentProviderRef.current)
+    scrollIntoViewWithin(modelsRef.current, currentModelRef.current)
+    positionedRef.current = true
+  }, [picker.open, activeProvider, current?.provider, current?.model, visibleGroups, activeModels])
+
+  // 展开时点击面板外关闭。面板已 portal 到 body，不在 rootRef 子树内，
+  // 故两处都要判：只判 rootRef 会把点面板内部当成外部而误关。
   useEffect(() => {
     if (!picker.open) return
     const closeOutside = (event: MouseEvent): void => {
-      if (!rootRef.current?.contains(event.target as Node)) {
-        setPicker(p => ({ ...p, open: false }))
-      }
+      const target = event.target as Node
+      if (rootRef.current?.contains(target) === true) return
+      if (menuRef.current?.contains(target) === true) return
+      setPicker(p => ({ ...p, open: false }))
     }
     document.addEventListener('mousedown', closeOutside)
     return () => { document.removeEventListener('mousedown', closeOutside) }
@@ -115,6 +238,21 @@ export function ModelPicker(props: ModelPickerProps) {
 
   const chooseProvider = (provider: string): void => {
     setPicker(p => ({ ...p, provider }))
+    // 切回当前模型所属提供商：滚到当前模型，而非停在顶部。
+    if (provider === current?.provider) {
+      // 该提供商已是活动列时模型列表不变、effect 不会重跑，故当场滚动，
+      // 否则把 pending 留给 effect，避免状态悬空到下一次无关重渲染才生效。
+      if (provider === activeProvider) {
+        scrollIntoViewWithin(modelsRef.current, currentModelRef.current)
+        pendingCurrentScrollRef.current = false
+        return
+      }
+      pendingCurrentScrollRef.current = true
+      return
+    }
+    pendingCurrentScrollRef.current = false
+    // 模型列容器在提供商切换间复用同一 DOM 节点，React 不会重置其滚动位置。
+    if (modelsRef.current !== null) modelsRef.current.scrollTop = 0
   }
 
   const chooseModel = (modelId: string): void => {
@@ -159,8 +297,14 @@ export function ModelPicker(props: ModelPickerProps) {
         </svg>
       </button>
 
-      {picker.open && (
-        <div className={css.menu} role="dialog" aria-label={t('modelPicker.trigger')}>
+      {picker.open && createPortal(
+        <div
+          ref={menuRef}
+          className={css.menu}
+          role="dialog"
+          aria-label={t('modelPicker.trigger')}
+          style={position ?? MEASURE_STYLE}
+        >
           <div className={css.search}>
             <span className={css.searchIcon} aria-hidden="true">
               <svg viewBox="0 0 16 16" fill="none">
@@ -180,7 +324,7 @@ export function ModelPicker(props: ModelPickerProps) {
           </div>
 
           <div className={css.columns}>
-            <aside className={css.providers} aria-label={t('modelPicker.providers')}>
+            <aside ref={providersRef} className={css.providers} aria-label={t('modelPicker.providers')}>
               <div className={css.columnTitle}>{t('modelPicker.providers')}</div>
               {state.status === 'loading' || loading
                 ? <div className={css.status}>{t('modelPicker.loading')}</div>
@@ -190,6 +334,7 @@ export function ModelPicker(props: ModelPickerProps) {
                     ? <div className={css.status}>{t('modelPicker.emptySearch')}</div>
                     : visibleGroups.map(group => (
                       <button
+                        ref={group.id === activeProvider ? currentProviderRef : null}
                         type="button"
                         className={`${css.cell} ${group.id === activeProvider ? css.cellActive : ''}`}
                         key={group.id}
@@ -199,7 +344,7 @@ export function ModelPicker(props: ModelPickerProps) {
                       </button>
                     ))}
             </aside>
-            <section className={css.models} aria-label={t('modelPicker.models')}>
+            <section ref={modelsRef} className={css.models} aria-label={t('modelPicker.models')}>
               <div className={css.columnTitle}>{t('modelPicker.models')}</div>
               {hasError && (
                 <div className={css.error} role="alert">
@@ -221,6 +366,7 @@ export function ModelPicker(props: ModelPickerProps) {
                     const selected = current?.provider === activeProvider && current.model === model.id
                     return (
                       <button
+                        ref={selected ? currentModelRef : null}
                         type="button"
                         className={`${css.cell} ${selected ? css.cellSelected : ''}`}
                         key={model.id}
@@ -234,7 +380,8 @@ export function ModelPicker(props: ModelPickerProps) {
                   })}
             </section>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   )
