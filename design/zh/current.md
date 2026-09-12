@@ -39,6 +39,9 @@ dsh 0.1.5 起服务方法在**调用方 Context** 下运行：client 插件调�
 - 功能描述：在输入框工具行（`conversation.input.right`，provider-label 右侧）提供级联模型选择器：左列提供商、右列该提供商模型，解决官方分组列表在提供商众多时难以定位的问题。
 - 实现位置：[src/client/model-picker/](../../src/client/model-picker/)
 - 解决方案：注册 `conversation.input.right` list 槽（`order: 1000`）；组件经 `hooks.directory` 订阅官方共享目录快照，`load`/`select` 走同一 `modelDirectories` 实例，与官方模型选择器（按钮/斜杠命令）状态互通。
+- 面板定位：经 `createPortal` 挂到 `document.body` 并以 `position: fixed` 呈现（`z-index: 1100`），使列的 `overflow: hidden` 裁切与侧栏遮挡均不再作用于它；坐标由本地 `useRightAlignedMenuPosition` 给出——右边缘对齐触发器、仅越出视口时钳位（官方 `useAnchoredPosition` 只从左边缘定位且无对齐选项，官方 `ModelSelect` 出于同一原因自行镜像了该逻辑）。
+- 窄屏适配：宽度下限为 `min(420px, calc(100vw - 32px))`，随视口收缩；模型名以 `overflow-wrap: anywhere` 换行完整显示，不截断。
+- 滚动行为：展开时在绘制前（`useLayoutEffect`）把当前提供商与当前模型滚进视野，每次展开只定位一次；切换提供商时模型列回到顶部；切回当前模型所属提供商时定位到当前模型。
 - 思路：不改官方 `ui-model-selection`（单槽无子槽可注入、整体替换会脱离官方更新）；复用共享 store 免自持状态；面板开合为 entry 本地状态。
 
 ### open-dsh-folder
