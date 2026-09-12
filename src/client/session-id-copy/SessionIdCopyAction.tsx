@@ -41,7 +41,7 @@ function HashGlyph() {
  */
 export function SessionIdCopyAction(props: SessionIdCopyActionProps) {
   const t = props.t
-  const id = props.sessionId
+  const id = String(props.sessionId)
   const [copied, setCopied] = useState(false)
   const pending = useRef(false)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
