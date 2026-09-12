@@ -16,6 +16,7 @@ import { installProviderLabel } from './provider-label'
 import { installOpenDshFolder } from './open-dsh-folder'
 import { installSettingsFrame } from './settings-frame'
 import { installModelPicker } from './model-picker'
+import { installSessionIdCopy } from './session-id-copy'
 import type { UiFortifierLocaleKey } from './locales.ts'
 
 /** 一个功能模块的安装面。 */
@@ -44,12 +45,17 @@ export const modules: Record<keyof Config, ModuleEntry> = {
     module: installModelPicker,
     dispose: undefined,
   },
+  'session-id-copy': {
+    module: installSessionIdCopy,
+    dispose: undefined,
+  },
 }
 
 /** 设置页开关行的显示顺序(按位置排序)；不在表中的字段排在其后。 */
 export const MODULE_ORDER: readonly (keyof Config)[] = [
   'provider-label',
   'model-picker',
+  'session-id-copy',
   'open-dsh-folder',
   'settings-frame',
 ]

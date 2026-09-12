@@ -13,6 +13,8 @@ export interface Config {
   'settings-frame': boolean
   /** 输入框右侧显示级联模型选择器(先选提供商、再选模型)。 */
   'model-picker': boolean
+  /** 会话标题栏显示复制会话 ID 按钮。 */
+  'session-id-copy': boolean
 }
 
 /** 打开 .dsh 文件夹的返回值。 */

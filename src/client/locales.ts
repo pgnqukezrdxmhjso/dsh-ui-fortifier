@@ -8,6 +8,7 @@ export type UiFortifierLocaleKey =
   | 'config.open-dsh-folder'
   | 'config.settings-frame'
   | 'config.model-picker'
+  | 'config.session-id-copy'
   | 'openDshFolder'
   | 'openDshFolder.error'
   | 'openDshFolder.pathLabel'
@@ -25,6 +26,9 @@ export type UiFortifierLocaleKey =
   | 'modelPicker.retry'
   | 'modelPicker.provider'
   | 'modelPicker.model'
+  | 'sessionIdCopy.action'
+  | 'sessionIdCopy.hint'
+  | 'sessionIdCopy.copied'
 
 /** 英文文案。 */
 export const en: Record<UiFortifierLocaleKey, string> = {
@@ -34,6 +38,7 @@ export const en: Record<UiFortifierLocaleKey, string> = {
   'config.open-dsh-folder': 'Settings top-right - Open .dsh folder',
   'config.settings-frame': 'Settings panel - Drag and resize',
   'config.model-picker': 'Input - Cascading model picker',
+  'config.session-id-copy': 'Session header - Copy session ID',
   openDshFolder: 'Open .dsh folder',
   'openDshFolder.error': 'Could not open the .dsh folder',
   'openDshFolder.pathLabel': 'Path: ',
@@ -51,6 +56,9 @@ export const en: Record<UiFortifierLocaleKey, string> = {
   'modelPicker.retry': 'Retry',
   'modelPicker.provider': 'Provider: {name}',
   'modelPicker.model': 'Model: {name}',
+  'sessionIdCopy.action': 'Copy Session ID',
+  'sessionIdCopy.hint': 'Session ID: {id}',
+  'sessionIdCopy.copied': 'Copied',
 }
 
 /** 中文文案。 */
@@ -61,6 +69,7 @@ export const zh: Record<UiFortifierLocaleKey, string> = {
   'config.open-dsh-folder': '设置右上角 - 打开 .dsh 文件夹',
   'config.settings-frame': '设置面板 - 拖动与缩放',
   'config.model-picker': '输入框 - 级联模型选择器',
+  'config.session-id-copy': '会话标题栏 - 复制 Session ID',
   openDshFolder: '打开 .dsh 文件夹',
   'openDshFolder.error': '无法打开 .dsh 文件夹',
   'openDshFolder.pathLabel': '路径：',
@@ -78,4 +87,7 @@ export const zh: Record<UiFortifierLocaleKey, string> = {
   'modelPicker.retry': '重试',
   'modelPicker.provider': '提供商：{name}',
   'modelPicker.model': '模型：{name}',
+  'sessionIdCopy.action': '复制 Session ID',
+  'sessionIdCopy.hint': 'Session ID: {id}',
+  'sessionIdCopy.copied': '已复制',
 }

@@ -18,6 +18,7 @@ export const Config: z<FortifierConfig> = z.object({
   'open-dsh-folder': z.boolean().default(true),
   'settings-frame': z.boolean().default(true),
   'model-picker': z.boolean().default(true),
+  'session-id-copy': z.boolean().default(true),
 })
 
 /**

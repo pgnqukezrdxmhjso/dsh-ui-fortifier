@@ -44,6 +44,13 @@ dsh 0.1.5 起服务方法在**调用方 Context** 下运行：client 插件调�
 - 滚动行为：展开时在绘制前（`useLayoutEffect`）把当前提供商与当前模型滚进视野，每次展开只定位一次；切换提供商时模型列回到顶部；切回当前模型所属提供商时定位到当前模型。
 - 思路：不改官方 `ui-model-selection`（单槽无子槽可注入、整体替换会脱离官方更新）；复用共享 store 免自持状态；面板开合为 entry 本地状态。
 
+### session-id-copy
+
+- 功能描述：在会话标题栏工具区增加复制 Session ID 的按钮；悬停提示直接显示会话 ID，点击写入剪贴板，成功后按钮短暂换成对勾。
+- 实现位置：[src/client/session-id-copy/](../../src/client/session-id-copy/)
+- 解决方案：注册 `conversation.session.header.utilities` list 槽（`order: -20`，排在该槽最左）；按钮为 28px 高胶囊，内含内联井号字形与复制字形并排；会话 ID 取自该槽的 owner 参数（`scope: 'session'`），经 `Tooltip` 原语在悬停/聚焦时以 `Session ID: {id}` 显示；复制走 ui-primitives 的 `writeClipboard`（优先异步 Clipboard API，缺失时回退 `execCommand`）。
+- 思路：三点菜单（「下载会话日志」所在菜单）的菜单项是硬编码数组、无插槽可注入，故以相邻按钮实现而非菜单项；不改 dsh 仓的 `session-log-export`（harness 源码会被 dsh 升级覆盖）；反馈方式照抄官方 `MessageIconActions` 的短对勾换图标；井号内联因官方图标库无标识符字形，提示用 `Tooltip` 原语而非原生 `title`（兼顾键盘聚焦，且不叠加两套提示）。
+
 ### open-dsh-folder
 
 - 功能描述：在设置页右上角操作区增加「打开 .dsh 文件夹」按钮，一键打开 `$DSH_HOME` 目录。
