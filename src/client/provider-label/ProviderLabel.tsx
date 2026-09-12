@@ -19,7 +19,7 @@ export type ProviderLabelProps =
 export function ProviderLabel(props: ProviderLabelProps) {
   const state = props.useDirectory(value => value)
   const provider = state.current?.provider
-  if (provider === undefined || provider.length === 0) return null
+  if (!provider) return null
   return (
     <span className={css.label} title={provider}>
       {provider}
