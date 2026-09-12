@@ -44,6 +44,13 @@ Since dsh 0.1.5, service methods run under the **caller's Context**: when the cl
 - Scroll behavior: on open, the current provider and current model scroll into view before paint (`useLayoutEffect`), positioned once per open; switching providers returns the model column to the top; switching back to the current model's provider positions to the current model.
 - Approach: The official `ui-model-selection` is untouched (single slot with no child slots to inject into; swapping the whole seat would outgrow official updates); reusing the shared store avoids a plugin-private copy; panel open/close is entry-local state.
 
+### session-id-copy
+
+- Description: Adds a copy-Session-ID button to the Session header's utility group; the hover hint shows the session ID itself, clicking writes it to the clipboard, and the button briefly swaps to a check mark.
+- Files: [src/client/session-id-copy/](../../src/client/session-id-copy/)
+- Solution: Registers the `conversation.session.header.utilities` list slot (`order: -20`, leftmost in that slot); the button is a 28px-tall pill holding an inline hash glyph beside a copy glyph; the session ID comes from the slot's owner parameters (`scope: 'session'`) and is shown as `Session ID: {id}` on hover/focus through the `Tooltip` primitive; copying uses ui-primitives' `writeClipboard` (async Clipboard API first, `execCommand` fallback).
+- Approach: The three-dot menu (the one holding "download session log") builds its items from a hardcoded array with no injectable slot, so this is an adjacent button rather than a menu item; the dsh repository's `session-log-export` is not modified (harness source is overwritten by dsh upgrades); the feedback mirrors the official `MessageIconActions` brief check-glyph swap; the hash glyph is inlined because the official icon library has no identifier glyph, and the hint uses the `Tooltip` primitive rather than a native `title` (it also covers keyboard focus and never stacks two hints).
+
 ### open-dsh-folder
 
 - Description: Adds an "Open .dsh folder" button to the Settings header action area that opens `$DSH_HOME` in one click.
