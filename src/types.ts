@@ -15,6 +15,8 @@ export interface Config {
   'model-picker': boolean
   /** 会话标题栏显示复制会话 ID 按钮。 */
   'session-id-copy': boolean
+  /** 输入框工具行左组右端显示压缩上下文按钮。 */
+  'compact-button': boolean
 }
 
 /** 打开 .dsh 文件夹的返回值。 */

@@ -9,6 +9,7 @@ export type UiFortifierLocaleKey =
   | 'config.settings-frame'
   | 'config.model-picker'
   | 'config.session-id-copy'
+  | 'config.compact-button'
   | 'openDshFolder'
   | 'openDshFolder.error'
   | 'openDshFolder.pathLabel'
@@ -29,6 +30,10 @@ export type UiFortifierLocaleKey =
   | 'sessionIdCopy.action'
   | 'sessionIdCopy.hint'
   | 'sessionIdCopy.copied'
+  | 'compactButton.action'
+  | 'compactButton.confirmTitle'
+  | 'compactButton.confirmText'
+  | 'compactButton.confirm'
 
 /** 英文文案。 */
 export const en: Record<UiFortifierLocaleKey, string> = {
@@ -39,6 +44,7 @@ export const en: Record<UiFortifierLocaleKey, string> = {
   'config.settings-frame': 'Settings panel - Drag and resize',
   'config.model-picker': 'Input - Cascading model picker',
   'config.session-id-copy': 'Session header - Copy session ID',
+  'config.compact-button': 'Input left group - Compact context',
   openDshFolder: 'Open .dsh folder',
   'openDshFolder.error': 'Could not open the .dsh folder',
   'openDshFolder.pathLabel': 'Path: ',
@@ -59,6 +65,10 @@ export const en: Record<UiFortifierLocaleKey, string> = {
   'sessionIdCopy.action': 'Copy Session ID',
   'sessionIdCopy.hint': 'Session ID: {id}',
   'sessionIdCopy.copied': 'Copied',
+  'compactButton.action': 'Compact context',
+  'compactButton.confirmTitle': 'Compact context',
+  'compactButton.confirmText': 'Confirm compaction?',
+  'compactButton.confirm': 'Confirm',
 }
 
 /** 中文文案。 */
@@ -70,6 +80,7 @@ export const zh: Record<UiFortifierLocaleKey, string> = {
   'config.settings-frame': '设置面板 - 拖动与缩放',
   'config.model-picker': '输入框 - 级联模型选择器',
   'config.session-id-copy': '会话标题栏 - 复制 Session ID',
+  'config.compact-button': '输入框左组 - 压缩上下文',
   openDshFolder: '打开 .dsh 文件夹',
   'openDshFolder.error': '无法打开 .dsh 文件夹',
   'openDshFolder.pathLabel': '路径：',
@@ -90,4 +101,8 @@ export const zh: Record<UiFortifierLocaleKey, string> = {
   'sessionIdCopy.action': '复制 Session ID',
   'sessionIdCopy.hint': 'Session ID: {id}',
   'sessionIdCopy.copied': '已复制',
+  'compactButton.action': '压缩上下文',
+  'compactButton.confirmTitle': '压缩上下文',
+  'compactButton.confirmText': '确认压缩？',
+  'compactButton.confirm': '确认',
 }

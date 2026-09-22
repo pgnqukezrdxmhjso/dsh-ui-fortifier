@@ -1,0 +1,61 @@
+/* 纯图标按钮：与左组「+」「回形针」同尺寸(28px 圆)同材质。 */
+.root {
+  display: inline-flex;
+  flex: none;
+}
+
+.button {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 999px;
+  corner-shape: round;
+  background: var(--dsw-specific-selector);
+  color: var(--dsw-alias-label-primary);
+  cursor: pointer;
+}
+
+.button:hover:not(:disabled) {
+  background: var(--dsw-alias-interactive-bg-hover-solid);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* 内联压缩字形：按钮 28px，字形取官方图标集默认的 16px 留出均匀内边距；
+   填充随按钮取色。 */
+.glyph {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  fill: currentColor;
+  overflow: hidden;
+}
+
+/* 确认气泡：材质对齐官方菜单；fixed 定位由 useAnchoredPosition 给出。 */
+.popover {
+  position: fixed;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: min(260px, calc(100vw - 32px));
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--dsw-specific-menu);
+  box-shadow: var(--dsw-elevation-prominent);
+  color: var(--dsw-alias-label-primary);
+}
+
+.popoverText {
+  margin: 0;
+  font-size: 13px;
+  line-height: 20px;
+}

@@ -22,9 +22,10 @@ Adds a "ui-fortifier" tab in Settings to toggle every feature module of this plu
 
 | Feature | Description |
 | --- | --- |
+| session-id-copy | Copy-session-ID button in the Session header's utility group. |
+| compact-button | Compact-context button at the right end of the composer tool row's left group; runs `/compact`. |
 | provider-label | Shows the currently selected provider to the left of the model selector. |
 | model-picker | Cascading model picker (provider → model) next to the model selector in the input row. |
-| session-id-copy | Copy-session-ID button in the Session header's utility group. |
 | open-dsh-folder | Adds an "Open .dsh folder" button next to "Open configuration file" at the top-right of the Settings page. |
 | settings-frame | Makes the Settings panel draggable and resizable. |
 

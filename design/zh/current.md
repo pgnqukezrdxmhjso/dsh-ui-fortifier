@@ -2,7 +2,7 @@
 
 ## 简介
 
-DSH Web UI 强化插件：在设置页提供功能模块开关，并显示当前会话的模型提供方。
+DSH Web 界面强化插件：不改动 dsh 源码，为官方 Web 界面补充额外的交互能力。
 
 ## 宏观描述
 
@@ -12,9 +12,11 @@ DSH Web UI 强化插件：在设置页提供功能模块开关，并显示当前
 
 两面各有独立编译面（`tsconfig.host.json` 走 node 全局、`tsconfig.client.json` 走浏览器全局），根 `tsconfig.json` 仅作 solution 聚合；两面共享的类型集中在 `src/types.ts`（仅类型、无运行时代码），因此 client 面不引用 host 文件。
 
-dsh 0.1.5 起服务方法在**调用方 Context** 下运行：client 插件调用 `ctx.modelDirectories.directoryFor()` 时，`this.ctx` 是本插件的 fiber，而该方法内部要读 `this.ctx.sessions` / `this.ctx.remote.session`，因此 client `inject` 必须与官方 `ui-model-selection` 同样声明 `sessions` / `remote` / `remote.session`，否则报 `cannot get property "remote.session" without inject`。
+服务方法在**调用方 Context** 下运行，故 client `inject` 必须与官方 `ui-model-selection` 同样声明 `sessions` / `remote` / `remote.session`：`ctx.modelDirectories.directoryFor()` 内部要读 `this.ctx.sessions` / `this.ctx.remote.session`，未声明即报 `cannot get property "remote.session" without inject`。
 
 ## todo
+
+- open-dsh-folder 兼容侧边栏插件：按钮改为嵌合按钮，常规部分用系统打开，示意部分在侧边栏打开；远程 dsh 下只保留在侧边栏打开；按当前是否加载了侧边栏插件自动切换这两种表现。
 
 ## 功能
 
@@ -22,7 +24,7 @@ dsh 0.1.5 起服务方法在**调用方 Context** 下运行：client 插件调�
 
 - 功能描述：在设置页新增「ui-fortifier」标签页，集中开关本插件各功能模块。开关行由设置页读取 `ui-fortifier` 命名空间的配置项自动生成。
 - 实现位置：[src/client/index.ts](../../src/client/index.ts)、[src/client/settings/FortifierSettingsPage.tsx](../../src/client/settings/FortifierSettingsPage.tsx)
-- 解决方案：client 侧绑定 settingsScope，从 describe mirror 读取命名空间值；开关行列表由显式顺序数组 `MODULE_ORDER`（`src/client/index.ts`）驱动、按位置排序后逐字段渲染；写入走 settings 作用域的写接口。
+- 解决方案：client 侧绑定 settingsScope，从 describe mirror 读取命名空间值；开关行列表由显式顺序数组 `MODULE_ORDER`（`src/client/index.ts`）驱动、按各模块在界面上的位置排列（会话标题栏 → 输入行 → 设置页）后逐字段渲染；写入走 settings 作用域的写接口。
 - 思路：新增功能时在 host `Config` 加字段、`modules` 加条目、`locales.ts` 加文案 key（`config.<字段名>`），设置页自动出现新开关，无需修改设置页代码。
 - 排版约束：列表内容限宽 520px（面板被拖宽时开关不远离文字），相邻选项用 0.5px 横线分隔。
 - 开关样式：照抄官方 `ui-settings-plugins` 的 Switch 模式（`role="switch"` + thumb），thumb 为 `border-radius: 50%` 正圆并配对 `corner-shape: round`——与 dsh 内置开关一致，受 ui-theme 全局超椭圆平滑规范约束（正圆必须配对保持圆弧）。
@@ -50,6 +52,16 @@ dsh 0.1.5 起服务方法在**调用方 Context** 下运行：client 插件调�
 - 实现位置：[src/client/session-id-copy/](../../src/client/session-id-copy/)
 - 解决方案：注册 `conversation.session.header.utilities` list 槽（`order: -20`，排在该槽最左）；按钮为 28px 高胶囊，内含内联井号字形与复制字形并排；会话 ID 取自该槽的 owner 参数（`scope: 'session'`），经 `Tooltip` 原语在悬停/聚焦时以 `Session ID: {id}` 显示；复制走 ui-primitives 的 `writeClipboard`（优先异步 Clipboard API，缺失时回退 `execCommand`）。
 - 思路：三点菜单（「下载会话日志」所在菜单）的菜单项是硬编码数组、无插槽可注入，故以相邻按钮实现而非菜单项；不改 dsh 仓的 `session-log-export`（harness 源码会被 dsh 升级覆盖）；反馈方式照抄官方 `MessageIconActions` 的短对勾换图标；井号内联因官方图标库无标识符字形，提示用 `Tooltip` 原语而非原生 `title`（兼顾键盘聚焦，且不叠加两套提示）。
+
+### compact-button
+
+- 功能描述：在输入框工具行左组（「+」、回形针、模式选择之后）的右端增加压缩上下文按钮，点击后经确认气泡确认才提交 `/compact` 指令。
+- 实现位置：[src/client/compact-button/](../../src/client/compact-button/)
+- 解决方案：注册 `conversation.input.left` list 槽（`order: 100`，该槽此前无占用者）；按钮为 28px 圆、与左组「+」「回形针」同材质；点击先弹出确认气泡，气泡内确认才经 `ctx.remote.commands.execute(sessionId, '/compact', [])` 提交指令，与官方 `/plan` 控件走同一命令通道；图标为内联压缩字形（用户指定，`viewBox 0 0 1024 1024`，16px，填充随按钮取色）；悬停提示用 `Tooltip` 原语，气泡展开时抑制提示避免叠两层。
+- 确认气泡：一句确认问句（`确认压缩？`）+ 一个确认键；无取消键，点外部或按 Escape 即取消。经 `createPortal` 挂 body、`position: fixed` 呈现（列的 `overflow: hidden` 无法裁切它），定位走官方 `useAnchoredPosition`（`side: 'top'`）；该 hook 在开启的同一帧量面板尺寸，故面板必须以隐藏的测量位置先挂载、量到坐标后再定位，否则高度按 0 计算且钳位与 `ResizeObserver` 修正均不生效，气泡会朝下溢出视口。
+- 禁用条件：`useSession(snapshot => snapshot.running)` 为真时禁用（运行中转忙碌时同时收起已展开的气泡）；提交等待期间亦禁用。
+- 焦点保持：`mousedown` 阻止默认行为，点击后光标留在编辑器内（左组其余按钮都这么做，否则点击会抢走焦点、正在输入的草稿失去光标）。
+- 思路：复用官方命令通道而非自行调用压缩能力，指令本身即「和压缩上下文指令一样」的定义，且 host 会把 `command/run`/`command/done` 生命周期写入会话流、结果作为会话节点呈现，故按钮不重复呈报成败；加确认气泡是因为压缩会重写历史且无撤销通道，一次误点即造成不可逆结果；运行中禁用是因为手动压缩要求 agent 空闲，不禁用只会让用户拿到一条必然失败的节点。图标为内联字形，因官方图标库没有压缩语义的字形；尺寸取 16px（官方图标集默认值）而非左组那两个图标的 14px，因该字形笔画更密，14px 下细节糊成一团。
 
 ### open-dsh-folder
 

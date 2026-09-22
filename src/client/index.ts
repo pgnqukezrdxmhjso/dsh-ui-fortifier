@@ -17,6 +17,7 @@ import { installOpenDshFolder } from './open-dsh-folder'
 import { installSettingsFrame } from './settings-frame'
 import { installModelPicker } from './model-picker'
 import { installSessionIdCopy } from './session-id-copy'
+import { installCompactButton } from './compact-button'
 import type { UiFortifierLocaleKey } from './locales.ts'
 
 /** 一个功能模块的安装面。 */
@@ -49,13 +50,18 @@ export const modules: Record<keyof Config, ModuleEntry> = {
     module: installSessionIdCopy,
     dispose: undefined,
   },
+  'compact-button': {
+    module: installCompactButton,
+    dispose: undefined,
+  },
 }
 
-/** 设置页开关行的显示顺序(按位置排序)；不在表中的字段排在其后。 */
+/** 设置页开关行的显示顺序：按各模块在界面上的位置，从会话标题栏到输入行再到设置页。 */
 export const MODULE_ORDER: readonly (keyof Config)[] = [
+  'session-id-copy',
+  'compact-button',
   'provider-label',
   'model-picker',
-  'session-id-copy',
   'open-dsh-folder',
   'settings-frame',
 ]
@@ -66,7 +72,7 @@ export const MODULE_ORDER: readonly (keyof Config)[] = [
 // `cannot get property "remote.session" without inject`。
 export const inject = [
   'slots', 'locale', 'settingsScope', 'modelDirectories', 'connection',
-  'sessions', 'remote', 'remote.session',
+  'sessions', 'remote', 'remote.session', 'remote.commands',
 ]
 
 /**
